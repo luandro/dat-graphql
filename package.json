@@ -1,0 +1,31 @@
+{
+  "name": "dat-graphql",
+  "version": "1.0.0",
+  "description": "Dat types for GraphQL",
+  "main": "index.js",
+  "scripts": {
+    "push": "git push origin master && git push --tags ssb master",
+    "prepublish": "npm run build",
+    "build": "babel schema -d lib",
+    "dev": "babel schema --watch -d lib",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "dat",
+    "graphql",
+    "p2p"
+  ],
+  "author": "Luandro <luandro@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-regenerator": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1"
+  },
+  "dependencies": {
+    "async": "^2.6.0",
+    "dat-node": "^3.5.8"
+  }
+}
