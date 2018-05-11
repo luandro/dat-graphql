@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "async": "^2.6.0",
+    "babel-runtime": "^6.26.0",
     "dat-node": "^3.5.8"
   }
 }
