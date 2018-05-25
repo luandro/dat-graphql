@@ -1,14 +1,17 @@
-// import Dat from './dat/types'
+import Dat from './dat/types'
+import Subscription from './subscription/type'
 import Query from './query/type'
 
 const Schema = () => [`
   schema {
-    query: Query
+    query: Query,
+    subscription: Subscription
   }
 `]
 
 export default [
-  // Dat,
+  Dat,
   Query,
+  Subscription,
   Schema,
 ]

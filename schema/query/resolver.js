@@ -1,5 +1,5 @@
-import { getDat } from '../dat/helpers'
+import { getDats } from '../dat/helpers'
 
 export default {
-  getDat: () => getDat(),
+  getDats: (_, {}, { sbot, dat, paths }) => getDats(dat, paths.datPath),
 }

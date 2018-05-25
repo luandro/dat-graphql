@@ -1,19 +1,33 @@
 const path = require('path')
-const Dat = require('dat-node')
 const fs = require('fs')
 const mirror = require('mirror-folder')
 const ram = require('random-access-memory')
+const mkdirp = require('mkdirp')
 
-const src = path.join(__dirname, '..')
-const dest = path.join(__dirname, 'tmp')
-fs.mkdirSync(dest)
-
-export const getDat = (_, { datHash }) => new Promise((resolve, reject) => {
-  Dat(ram, {key: datHash, sparse: true}, (err, dat) => {
-    if (err) throw err
+export const downloadDat = (pubsub, channel, Dat, datPath, hash) => {
+  const dest = path.join(datPath, hash)
+  if (!fs.existsSync(dest)) {
+    mkdirp.sync(dest)
+  }
+  let downloadDat = {
+    name: null,
+    connected: false,
+    subscribed: false,
+    progress: 0,
+    done: false,
+    peers: 0,
+  }
+  Dat(ram, {key: hash, sparse: true}, (err, dat) => {
+    if (err) console.log('Error on downloading dat ', err)
     const network = dat.joinNetwork()
+    const stats = dat.trackStats()
+
     network.once('connection', () => {
+      const peers = stats.peers
       console.log('Connected')
+      downloadDat.connected = true
+      downloadDat.peers = dat.network.connected
+      pubsub.publish(channel, { downloadDat })
     })
     dat.archive.metadata.update(download)
 
@@ -21,19 +35,22 @@ export const getDat = (_, { datHash }) => new Promise((resolve, reject) => {
       const progress = mirror({fs: dat.archive, name: '/'}, dest, (err) => {
         if (err) throw err
         console.log('Done')
+        downloadDat.done = true
+        console.log('RES', downloadDat)
+        pubsub.publish(channel, { downloadDat })
       })
       progress.on('put', (src) => {
         console.log('Downloading', src.name)
       })
     }
     console.log(`Downloading: ${dat.key.toString('hex')}\n`)
-    resolve(dat.key.toString('hex'))
+    downloadDat.name = dat.key.toString('hex')
   })
-})
+}
 
-export const shareDat = (_, { file }) => new Promise((resolve, reject) => {
-  Dat(src, {temp: true}, (err, dat) => {
-    if (err) throw err
+export const shareDat = (pubsub, channel, Dat, datPath) => new Promise((resolve, reject) => {
+  Dat(src, (err, dat) => {
+    if (err) console.log('Err on sharing ', err)
   
     const network = dat.joinNetwork()
     network.once('connection', () => {
@@ -52,4 +69,15 @@ export const shareDat = (_, { file }) => new Promise((resolve, reject) => {
   
     console.log(`Sharing: ${dat.key.toString('hex')}\n`)
   })
+})
+
+export const getDats = (Dat, datPath) => new Promise((resolve, reject) => {
+  console.log('datPath', datPath)
+  let res = []
+  const files = fs.readdirSync(datPath)
+  const datFolders = files.filter(file => file.length === 64)
+  datFolders.map(folder => res.push({
+    name: folder
+  }))
+  resolve(res)
 })

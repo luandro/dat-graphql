@@ -1,20 +1,11 @@
-import { getConnectedPeers } from '../ssb/gossip/helpers'
+import { downloadDat } from '../dat/helpers'
 
 export default {
-  counter: {
-    subscribe: (parent, args, { pubsub }) => {
+  downloadDat: {
+    subscribe: (_, { hash }, { pubsub, sbot, dat, paths }) => {
       const channel = Math.random().toString(36).substring(2, 15) // random channel name
-      let count = 0
-      setInterval(() => pubsub.publish(channel, { counter: { count: count++ } }), 2000)
+      downloadDat(pubsub, channel, dat, paths.datPath, hash)
       return pubsub.asyncIterator(channel)
-    },
+    }
   },
-  gossip: {
-    subscribe: (parent, args, { pubsub, sbot }) => {
-      const { connected } = args
-      const channel = Math.random().toString(36).substring(2, 15) // random channel name
-      getConnectedPeers(sbot, pubsub, channel, connected)
-      return pubsub.asyncIterator(channel)
-    },
-  }
 }

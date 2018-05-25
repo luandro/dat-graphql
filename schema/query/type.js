@@ -1,6 +1,6 @@
 const Query = `
   type Query {
-    getDat(hash: String!): String
+    getDats: [Dat]
   }
 `
 module.exports = () => [Query]

@@ -1,7 +1,7 @@
-// import Dat from './dat/resolvers'
+import Subscription from './subscription/resolver'
 import Query from './query/resolver'
 
 export default {
-  // Dat,
+  Subscription,
   Query,
 }
